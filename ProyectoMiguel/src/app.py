@@ -3,24 +3,16 @@ import gradio as gr
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Motores de extracción de texto para documentos binarios
 from pypdf import PdfReader
 import docx
 
-# Cargar variables de entorno por seguridad
 load_dotenv()
 
-# =====================================================================
-# 🖥️ CONEXIÓN A LM STUDIO (SERVIDOR LOCAL)
-# =====================================================================
 client = OpenAI(
     base_url="http://localhost:1234/v1",
     api_key="lm-studio"
 )
 
-# =====================================================================
-# 📂 PARSER UNIVERSAL DE ARCHIVOS
-# =====================================================================
 def extraer_texto_de_archivo(file_obj):
     if file_obj is None:
         return ""
@@ -49,9 +41,6 @@ def extraer_texto_de_archivo(file_obj):
     except Exception as e:
         return f"[Error crítico al procesar archivo]: {str(e)}"
 
-# =====================================================================
-# 💬 LÓGICA DEL CHAT INTERACTIVO (MEMORIA FLUIDA)
-# =====================================================================
 def chat_evaluacion(message, history, archivo_adjunto):
     contents = []
     
@@ -116,17 +105,12 @@ def chat_evaluacion(message, history, archivo_adjunto):
             return "⚠️ Error de Contexto: El documento es demasiado largo para LM Studio. Incrementa el n_ctx a 8192 o superior."
         return f"Error de enlace local: {str(e)}. Asegúrate de que el servidor local esté encendido."
 
-# =====================================================================
-# 🎨 INTERFAZ WEB MAXIMIZADA HASTA EL FONDO (Gradio)
-# =====================================================================
-# Inyectamos CSS para obligar a que el contenedor del chat use una altura expandida
-css_personalizado = """
+cssP = """
 .contenedor-chat { height: 70vh !important; }
 """
 
-with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="slate"), css=css_personalizado) as demo:
+with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="slate"), css=cssP) as demo:
     
-    # Encabezado Minimalista
     gr.HTML("""
     <div style="text-align: left; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #1e293b;">
         <h1 style="font-size: 1.6rem; font-weight: 800; color: #3b82f6; margin-bottom: 4px; display: inline-block;">🎓 Sistema de Evaluación de Carga Cognitiva</h1>
@@ -136,7 +120,6 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="slate"), 
     
     with gr.Row():
         
-        # Panel Izquierdo Compacto
         with gr.Column(scale=1, variant="panel"):
             gr.Markdown("### 📂 Documento a Evaluar")
             archivo_input = gr.File(
@@ -150,7 +133,6 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="slate"), 
             </div>
             """)
             
-        # Panel Derecho Maximizado en Ancho y Alto
         with gr.Column(scale=8, variant="elevation", elem_classes=["contenedor-chat"]):
             chat = gr.ChatInterface(
                 fn=chat_evaluacion,
